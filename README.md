@@ -1,17 +1,23 @@
+```bash
 cat << EOF > dns.txt
 
 EOF
+```
 
+```bash
 awk -F"[][]" '/CS-Production_LAN_HN2/ {gsub(/[{}'\'']/,""); print "hnb" ++count2 " ansible_host=" $2 > "HN2.txt"}' dns.txt
 awk -F"[][]" '/CS_Production_LAN_HN1/ {gsub(/[{}'\'']/,""); print "hna" ++count1 " ansible_host=" $2 > "HN1.txt"}' dns.txt
+```
 
+```bash
 echo "[HN1]" > hosts
 cat HN1.txt >> hosts
 echo "" >> hosts
 echo "[HN2]" >> hosts
 cat HN2.txt >> hosts
+```
 
-
+```bash
 cat << EOF >> hosts
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3
@@ -19,8 +25,9 @@ ansible_ssh_extra_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/n
 ansible_ssh_private_key_file=${HOME}/.ssh/id_rsa
 ansible_user=root
 EOF
+```
 
-
+```bash
 cat << EOF > playbook.yaml
 - hosts: HN1
   become: true
@@ -80,5 +87,10 @@ cat << EOF > playbook.yaml
           become: true
           when: "'Failed to set DNS configuration: Link' in dns_result.stderr"
 EOF
+```
 
+Run command line
+
+```bash
 ansible-playbook -i hosts playbook.yaml
+```
