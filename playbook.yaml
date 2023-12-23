@@ -1,0 +1,57 @@
+- hosts: HN1
+  become: true
+  tasks:
+    - name: Set current interface HN1
+      set_fact:
+        current_interface: "{{ ansible_default_ipv4['interface'] }}"
+
+    - name: Set DNS servers HN1
+      shell: resolvectl dns {{ current_interface }} A.A.A.A 8.8.8.8
+      become: true
+      register: dns_result
+      ignore_errors: true
+
+    - name: Check DNS status HN1
+      shell: resolvectl status {{ current_interface }}
+      become: true
+
+    - name: Handle DNS error HN1
+      block:
+        - name: Set DNS servers (fallback) HN1
+          shell: sudo resolvectl dns {{ current_interface }} ''
+          become: true
+          when: "'Failed to set DNS configuration: Link' in dns_result.stderr"
+
+        - name: Set DNS servers (fallback) HN1
+          shell: sudo resolvectl dns {{ current_interface }} A.A.A.A
+          become: true
+          when: "'Failed to set DNS configuration: Link' in dns_result.stderr"
+
+- hosts: HN2
+  become: true
+  tasks:
+    - name: Set current interface HN2
+      set_fact:
+        current_interface: "{{ ansible_default_ipv4['interface'] }}"
+
+    - name: Set DNS servers HN2
+      shell: resolvectl dns {{ current_interface }} B.B.B.B 8.8.8.8
+      become: true
+      register: dns_result
+      ignore_errors: true
+
+    - name: Check DNS status HN2
+      shell: resolvectl status {{ current_interface }}
+      become: true
+
+    - name: Handle DNS error HN2
+      block:
+        - name: Set DNS servers (fallback) HN2
+          shell: sudo resolvectl dns {{ current_interface }} ''
+          become: true
+          when: "'Failed to set DNS configuration: Link' in dns_result.stderr"
+
+        - name: Set DNS servers (fallback) HN2
+          shell: sudo resolvectl dns {{ current_interface }} B.B.B.B
+          become: true
+          when: "'Failed to set DNS configuration: Link' in dns_result.stderr"

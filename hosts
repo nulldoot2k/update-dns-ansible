@@ -1,0 +1,15 @@
+[HN1]
+hna1 ansible_host=A.A.A.1
+hna2 ansible_host=A.A.A.2
+
+[HN2]
+hnb1 ansible_host=B.B.B.1
+hnb2 ansible_host=B.B.B.2
+hnb3 ansible_host=B.B.B.3
+hnb4 ansible_host=B.B.B.4
+...
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
+ansible_ssh_extra_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
+ansible_ssh_private_key_file=${HOME}/.ssh/id_rsa
+ansible_user=${USER}
